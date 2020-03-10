@@ -55,7 +55,7 @@ def shiftCipherDec():
             newPos = (pos-key)%26
             dec += alphabet[newPos]
 
-        fileOut.write(dec + "\n")
+        # fileOut.write(dec + "\n")
 
 def afineCipherEnc():
     a = int(args.encryption_keys[0]) # add the two numbers without space
@@ -72,7 +72,7 @@ def afineCipherEnc():
             newPos = (a*pos + b) %26
             enc += alphabet[newPos]
 
-        fileOut.write(enc + "\n")
+        # fileOut.write(enc + "\n")
 
 def afineCipherDec():
     a = args.encryption_keys[0]
@@ -96,9 +96,65 @@ def afineCipherDec():
             newPos = (a * pos + b) % 26
             dec += alphabet[newPos]
 
-        fileOut.write(dec + "\n")
+        # fileOut.write(dec + "\n")
 
+def vigenereCipherEnc():
+    if fileIn.mode == 'r':
+        plain_text = fileIn.read()
+        input_lines=plain_text.split('\n')
+        for line in input_lines :
+            cipher_text=""
+            keyword = args.encryption_keys
+            for i in range(len(line) - len(keyword)):
+                keyword+=keyword[i]
+            for i in range(len(line)):
+                if line[i].isupper() and keyword[i].isupper():
+                    x = (ord(line[i]) - 65)
+                    k = (ord(keyword[i]) - 65)
+                    cipher_text += chr((((x + k) % 26) + 65))
+                elif line[i].isupper() and keyword[i].islower():
+                    x = (ord(line[i]) - 65)
+                    k = (ord(keyword[i]) - 97)
+                    cipher_text += chr((((x + k) % 26) + 65))
+                elif line[i].islower() and keyword[i].isupper():
+                    x = (ord(line[i]) - 97)
+                    k = (ord(keyword[i]) - 65)
+                    cipher_text += chr((((x + k) % 26) + 97))
+                elif line[i].islower() and keyword[i].islower():
+                    x = (ord(line[i]) - 97)
+                    k = (ord(keyword[i]) - 97)
+                    cipher_text += chr((((x + k) % 26) + 97))
 
+            fileOut.write(cipher_text+"\n")
+
+def vigenereCipherDec():
+    if fileIn.mode == 'r':
+        cipher_text = fileIn.read()
+        input_lines = cipher_text.split('\n')
+        for line in input_lines:
+            plain_text = ""
+            keyword = args.encryption_keys
+            for i in range(len(line) - len(keyword)):
+                keyword += keyword[i]
+            for i in range(len(line)):
+                if line[i].isupper() and keyword[i].isupper():
+                    y = (ord(line[i]) - 65)
+                    k = (ord(keyword[i]) - 65)
+                    plain_text += chr((((y - k + 26) % 26) + 65))
+                elif line[i].isupper() and keyword[i].islower():
+                    y = (ord(line[i]) - 65)
+                    k = (ord(keyword[i]) - 97)
+                    plain_text += chr((((y - k + 26) % 26) + 65))
+                elif line[i].islower() and keyword[i].isupper():
+                    y = (ord(line[i]) - 97)
+                    k = (ord(keyword[i]) - 65)
+                    plain_text += chr((((y - k + 26) % 26) + 97))
+                elif line[i].islower() and keyword[i].islower():
+                    y = (ord(line[i]) - 97)
+                    k = (ord(keyword[i]) - 97)
+                    plain_text += chr((((y - k + 26) % 26) + 97))
+
+            fileOut.write(plain_text+"\n")
 
 if __name__ == "__main__":
 
@@ -107,9 +163,15 @@ if __name__ == "__main__":
             shiftCipherEnc()
         elif define_parameters().Operation_type == "dec":
             shiftCipherDec()
+
     elif define_parameters().Cipher_type == "affine":
         if define_parameters().Operation_type == "enc":
             afineCipherEnc()
         elif define_parameters().Operation_type == "dec":
             afineCipherDec()
 
+    elif define_parameters().Cipher_type == "vigenere":
+        if define_parameters().Operation_type == "enc":
+            vigenereCipherEnc()
+        elif define_parameters().Operation_type == "dec":
+            vigenereCipherDec()
